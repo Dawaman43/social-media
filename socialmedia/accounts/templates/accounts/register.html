@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    
+    <style>
+        /* 🌟 General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* 🌞 Light Mode */
+        body.light-mode {
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        /* 🌙 Dark Mode */
+        body.dark-mode {
+            background: #1e1e1e;
+            color: #f4f4f4;
+        }
+
+        /* 🔥 Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .logo img {
+            width: 50px;
+            animation: floatLogo 3s ease-in-out infinite;
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* 🎭 Card Styling */
+        .card {
+            border-radius: 12px;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        body.light-mode .card {
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .card {
+            background: #2a2a2a;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        /* 🖋️ Inputs & Labels */
+        .form-group label {
+            font-weight: bold;
+            transition: color 0.3s ease;
+            text-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+        }
+
+        body.dark-mode .form-group label {
+            color: #ffffff;
+            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .form-control {
+            transition: 0.3s ease-in-out;
+            border-radius: 5px;
+        }
+
+        body.light-mode .form-control {
+            background: #fff;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+
+        body.dark-mode .form-control {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.7);
+            border-color: #007bff;
+        }
+
+        /* 🚀 Buttons */
+        .btn-primary {
+            width: 100%;
+            transition: 0.3s;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        body.light-mode .btn-primary {
+            background: #007bff;
+            border: none;
+        }
+
+        body.dark-mode .btn-primary {
+            background: #2196f3;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+
+        /* 🌗 Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 22px;
+        }
+
+        body.light-mode .theme-toggle {
+            color: #333;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #f4f4f4;
+        }
+
+        /* ✨ Glow Text */
+        h2, h3 {
+            text-shadow: 0px 0px 10px rgba(0, 123, 255, 0.5);
+        }
+
+        body.dark-mode h2, body.dark-mode h3 {
+            text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* 🏁 Footer */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body class="light-mode"> <!-- Default to Light Mode -->
+
+    <!-- 🔘 Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+    <!-- 🔥 Header with Logo -->
+    <header class="header">
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="logo">
+        </div>
+        <h1>DMedia</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2 class="text-center">Register</h2>
+
+            <!-- Error Messages -->
+            {% if messages %}
+                <div class="alert alert-danger">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" class="form-control" id="username" placeholder="Enter username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" name="password1" class="form-control" id="password1" placeholder="Enter password">
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" name="password2" class="form-control" id="password2" placeholder="Confirm password">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
+                </div>
+
+                <div class="form-group text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </div>
+            </form>
+
+            <p class="text-center mt-3 text-secondary">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 DMedia | <a href="#">Privacy Policy</a> | <a href="#">Terms</a></p>
+    </footer>
+
+    <!-- 🌗 Theme Toggle Script -->
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('light-mode')) {
+                body.classList.replace('light-mode', 'dark-mode');
+                button.innerHTML = "☀️";
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.replace('dark-mode', 'light-mode');
+                button.innerHTML = "🌙";
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme from LocalStorage
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.replace('light-mode', 'dark-mode');
+                document.querySelector('.theme-toggle').innerHTML = "☀️";
+            }
+        });
+    </script>
+
+</body>
+</html>

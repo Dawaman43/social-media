@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    
+    <!-- Load Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    
+    <style>
+        /* Global Styles */
+        body {
+            background-color: lightblue !important;
+        }
+
+        /* Header Styles */
+        .header-logo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header-logo img {
+            height: 50px;
+            cursor: pointer;
+        }
+
+        /* Container Styling */
+        .container {
+            margin-top: 20px;
+            max-width: 800px;
+            padding: 0 15px;
+        }
+
+        /* Profile Picture Styling */
+        .profile-picture img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+
+        /* Textarea Styling */
+        textarea.form-control {
+            width: 100%;
+            resize: vertical;
+            box-sizing: border-box;
+            max-width: 100%;
+            min-height: 100px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            textarea.form-control {
+                min-height: 120px;
+            }
+
+            .form-control {
+                max-width: 100%;
+            }
+
+            .error-message {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header-logo">
+        <a href="{% url 'home' %}">
+            <img src="{% static 'images/logo.png' %}" alt="Website Logo">
+        </a>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container mt-5">
+        <h2>Edit Your Profile</h2>
+
+        <!-- Profile Picture Display -->
+        <div class="profile-picture mb-3 d-flex justify-content-center">
+            <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" 
+                 alt="Profile Picture" class="img-thumbnail">
+        </div>
+
+        <!-- Profile Edit Form -->
+        <form method="POST" enctype="multipart/form-data" action="{% url 'edit_profile' %}">
+            {% csrf_token %}
+            
+            <!-- First Name Field -->
+            <div class="form-group">
+                <label for="id_first_name">First Name</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <div class="error-message">
+                        {% for error in form.first_name.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Last Name Field -->
+            <div class="form-group">
+                <label for="id_last_name">Last Name</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div class="error-message">
+                        {% for error in form.last_name.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Bio Field -->
+            <div class="form-group">
+                <label for="id_bio">Bio</label>
+                {{ form.bio|add_class:"form-control" }}
+                {% if form.bio.errors %}
+                    <div class="error-message">
+                        {% for error in form.bio.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Profile Picture Upload Field -->
+            <div class="form-group">
+                <label for="id_profile_picture">Upload Profile Picture</label>
+                {{ form.profile_picture }}
+                {% if form.profile_picture.errors %}
+                    <div class="error-message">
+                        {% for error in form.profile_picture.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-light text-center p-3">
+        <p>&copy; 2025 DMedia | <a href="#">Privacy Policy</a></p>
+    </footer>
+
+    <!-- Load JS Scripts -->
+    <script src="{% static 'js/jquery-3.7.1.slim.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

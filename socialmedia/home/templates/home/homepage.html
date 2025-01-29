@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            flex: 1;
+        }
+        .post-card {
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Subtle shadow effect */
+        }
+        .liked {
+            background-color: #0d6efd; /* Blue for liked state */
+            color: white;
+        }
+        .like-icon {
+            width: 20px;
+            height: 20px;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">
+            <img class="rounded-circle" width="50px" src="{% static 'images/logo.png' %}" alt="Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="mx-auto">
+                <form class="d-flex" method="GET" action="{% url 'search' %}">
+                    <input class="form-control me-2 w-100 w-md-50" type="search" placeholder="Search" name="q">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+            <div class="ms-auto d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'user_profile' user.id %}">
+                        <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}" 
+                             alt="Profile" class="rounded-circle me-2" width="40">
+                    </a>
+                    <span class="text-white">{{ user.first_name }} {{ user.last_name }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger ms-3">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary ms-3">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+
+        <!-- Post Form -->
+        <form method="POST" action="{% url 'post_content' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea name="post_text" class="form-control w-100 mb-2" required placeholder="Write your post here..."></textarea>
+                <button class="btn btn-success w-100" type="submit">Post</button>
+            </div>
+        </form>
+
+        <!-- Display Posts -->
+        <div class="mt-5">
+            {% for post in posts %}
+            <div class="post-card mb-4 p-3 border rounded">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <a href="{% url 'user_profile' post.user.id %}">
+                            <img src="{% if post.user.profile.profile_picture %}{{ post.user.profile.profile_picture.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}" 
+                                 class="rounded-circle" width="50" height="50">
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="{% url 'user_profile' post.user.id %}" class="text-dark">
+                            {{ post.user.first_name|default:post.user.username }} {{ post.user.last_name|default:'' }}
+                        </a>
+                    </div>
+                </div>
+
+                <p class="mt-3">{{ post.post_text }}</p>
+
+                <!-- Share Buttons -->
+                <div class="d-flex gap-2 mt-2">
+                    
+                    <button class="btn btn-outline-primary btn-sm like-button"
+                            data-post-id="{{ post.id }}"
+                            data-liked="{% if post in liked_posts %}true{% else %}false{% endif %}">
+                        <img src="{% static 'images/' %}{% if post in liked_posts %}liked.png{% else %}like.png{% endif %}" 
+                             alt="like icon" width="20px"> 
+                        {% if post.like_count > 0 %}
+                            ({{ post.like_count }})
+                        {% else %}
+                            
+                        {% endif %}
+                    </button>
+                    <a href="{% url 'post_detail' pk=post.pk %}" class="btn btn-outline-secondary btn-sm comment-button">
+                        <img src="{% static 'images/comment.png'%}" width="20px"
+                             alt="comment icon"> 
+                        {% if post.comment_count > 0 %}
+                            Comment ({{ post.comment_count }})
+                        {% else %}
+                            
+                        {% endif %}
+                    </a>
+                    <!-- Facebook Share Button -->
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ post.absolute_url }}" target="_blank" class="btn btn-outline-info btn-sm share-button">
+                        <img src="{% static 'images/facebook.png' %}" alt="Facebook" width="18" height="18">
+                    </a>
+                    <a href="https://www.instagram.com/?url={{ post.absolute_url }}" target="_blank" class="btn btn-outline-danger btn-sm share-button">
+                        <img src="{% static 'images/instagram.png' %}" alt="Instagram" width="18" height="18">
+                    </a>
+                       
+
+                </div>
+            </div>
+            {% empty %}
+            <p>No posts to display</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center p-3">
+        <p>&copy; 2025 DMovies | <a href="#">Privacy Policy</a> | <a href="#">Terms and Conditions</a></p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $(".like-button").click(function(e){
+                e.preventDefault(); 
+                let button = $(this);
+                let postId = button.data("post-id");
+                let isLiked = button.data("liked");
+                let likeIcon = button.find("img");
+
+                button.html('<div class="spinner"></div>');  // Show loading spinner
+
+                $.ajax({
+                    url: `/like/${postId}/`,
+                    type: "POST",
+                    headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                    data: { liked: !isLiked },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            button.data("liked", response.liked);
+                            likeIcon.attr("src", response.liked ? "{% static 'images/liked.png' %}" : "{% static 'images/like.png' %}");
+                            button.html(`<img src="${likeIcon.attr("src")}" class="like-icon"> (${response.like_count})`);
+                        }
+                    },
+                    error: function() {
+                        alert("Something went wrong. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

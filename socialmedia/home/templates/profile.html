@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile.user.first_name }}'s Profile</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        .header-logo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header-logo img {
+            height: 50px;
+            cursor: pointer;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header img {
+            border-radius: 50%;
+            border: 3px solid #007bff;
+        }
+
+        .post-card {
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .like-button, .share-button, .comment-button {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .like-button, .comment-button {
+            color: #0d6efd;
+        }
+        .share-button {
+            color: #dc3545;
+        }
+        .btn-outline-primary, .btn-outline-secondary {
+            border-width: 2px;
+        }
+        .like-button img, .share-button img {
+            width: 18px;
+            height: 18px;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .sort-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            justify-content: center;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Logo -->
+    <header class="header-logo">
+        <a href="{% url 'home' %}">
+            <img src="{% static 'images/logo.png' %}" alt="Website Logo">
+        </a>
+    </header>
+
+    <div class="container mt-5">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" 
+                 alt="Profile Picture" width="150" height="150">
+            <h2>{{ profile.user.first_name }} {{ profile.user.last_name }}</h2>
+            <p><strong>Email:</strong> {{ profile.user.email }}</p>
+            <p><strong>Bio:</strong> {{ profile.bio }}</p>
+        </div>
+
+        <!-- Edit Profile Form (Only for Authenticated User) -->
+        {% if is_own_profile %}
+            <div class="card p-4 mt-4">
+                <h3>Edit Your Profile</h3>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </form>
+            </div>
+        {% endif %}
+
+
+
+        <!-- Posts Section -->
+        <div class="mt-5">
+            <h3>Posts by {{ profile.user.first_name }}</h3>
+            {% for post in posts %}
+                <div class="post-card mb-4 p-3 border rounded">
+                    <p>{{ post.post_text }}</p>
+                    <div class="d-flex gap-2 mt-2">
+                    
+                        <button class="btn btn-outline-primary btn-sm like-button"
+                                data-post-id="{{ post.id }}"
+                                data-liked="{% if post in liked_posts %}true{% else %}false{% endif %}">
+                            <img src="{% static 'images/' %}{% if post in liked_posts %}liked.png{% else %}like.png{% endif %}" 
+                                 alt="like icon" width="20px"> 
+                            {% if post.like_count > 0 %}
+                                ({{ post.like_count }})
+                            {% else %}
+                                
+                            {% endif %}
+                        </button>
+                        <a href="{% url 'post_detail' pk=post.pk %}" class="btn btn-outline-secondary btn-sm comment-button">
+                            <img src="{% static 'images/comment.png'%}" width="20px"
+                                 alt="comment icon"> 
+                            {% if post.comment_count > 0 %}
+                                Comment ({{ post.comment_count }})
+                            {% else %}
+                                
+                            {% endif %}
+                        </a>
+                        <!-- Facebook Share Button -->
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ post.absolute_url }}" target="_blank" class="btn btn-outline-info btn-sm share-button">
+                            <img src="{% static 'images/facebook.png' %}" alt="Facebook" width="18" height="18">
+                        </a>
+                        <a href="https://www.instagram.com/?url={{ post.absolute_url }}" target="_blank" class="btn btn-outline-danger btn-sm share-button">
+                            <img src="{% static 'images/instagram.png' %}" alt="Instagram" width="18" height="18">
+                        </a>
+                           
+    
+                    </div>
+                </div>
+            {% empty %}
+                <p>No posts available</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ query }}&sort_by={{ sort_by }}&page=1" class="page-link">&laquo; 1</a>
+                <a href="?q={{ query }}&sort_by={{ sort_by }}&page={{ page_obj.previous_page_number }}" class="page-link">Previous</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="page-item active"><span class="page-link">{{ num }}</span></span>
+                {% else %}
+                    <a href="?q={{ query }}&sort_by={{ sort_by }}&page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ query }}&sort_by={{ sort_by }}&page={{ page_obj.next_page_number }}" class="page-link">Next</a>
+                <a href="?q={{ query }}&sort_by={{ sort_by }}&page={{ page_obj.paginator.num_pages }}" class="page-link">{{ page_obj.paginator.num_pages }} &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="bg-light text-center p-3 mt-5">
+        <p>&copy; 2025 DMedia | <a href="#">Privacy Policy</a></p>
+    </footer>
+
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $(".like-button").click(function(e){
+                e.preventDefault(); 
+                let button = $(this);
+                let postId = button.data("post-id");
+                let isLiked = button.data("liked");
+                let likeIcon = button.find("img");
+
+                button.html('<div class="spinner"></div>');  // Show loading spinner
+
+                $.ajax({
+                    url: `/like/${postId}/`,
+                    type: "POST",
+                    headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                    data: { liked: !isLiked },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            button.data("liked", response.liked);
+                            likeIcon.attr("src", response.liked ? "{% static 'images/liked.png' %}" : "{% static 'images/like.png' %}");
+                            button.html(`<img src="${likeIcon.attr("src")}" class="like-icon"> (${response.like_count})`);
+                        }
+                    },
+                    error: function() {
+                        alert("Something went wrong. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

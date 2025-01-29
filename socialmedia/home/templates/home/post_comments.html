@@ -1,0 +1,37 @@
+{% extends 'home/homepage.html' %}  <!-- Extending homepage.html -->
+
+{% block title %}Post Comments{% endblock %}
+
+{% block content %}
+    <h1>Post Comments</h1>
+
+    <!-- Display the post -->
+    <div class="post-details">
+        <p>{{ post.post_text }}</p>
+        <p><strong>Posted by:</strong> {{ post.user.first_name }} {{ post.user.last_name }} at {{ post.post_date }}</p>
+    </div>
+
+    <!-- Comment Form -->
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="comment" placeholder="Write your comment..." required></textarea>
+        <button type="submit">Add Comment</button>
+    </form>
+
+    <!-- Display Comments -->
+    <div class="comments-section">
+        <h3>Comments</h3>
+        <ul>
+            {% for comment in comments %}
+                <li>
+                    <strong>{{ comment.user.first_name }} {{ comment.user.last_name }}:</strong> 
+                    {{ comment.content }} <br>
+                    <small>Posted on: {{ comment.timestamp }}</small>
+                </li>
+            {% empty %}
+                <li>No comments yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
