@@ -1,0 +1,236 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    
+    <style>
+        /* 🌟 General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* 🌞 Light Mode */
+        body.light-mode {
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        /* 🌙 Dark Mode */
+        body.dark-mode {
+            background: #1e1e1e;
+            color: #f4f4f4;
+        }
+
+        /* 🎭 Sidebar */
+        .sidebar {
+            background: #007bff;
+            color: white;
+            height: 100vh;
+            padding-top: 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background: #0056b3;
+        }
+
+        /* Main content area */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* 🎛️ Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            font-size: 1.5rem;
+        }
+
+        .header .theme-toggle {
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Card Styling */
+        .card {
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        body.light-mode .card {
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .card {
+            background: #2a2a2a;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        /* 🖋️ Inputs & Labels */
+        .form-group label {
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .form-group label {
+            color: #ffffff;
+        }
+
+        .form-control {
+            transition: 0.3s ease-in-out;
+            border-radius: 5px;
+        }
+
+        body.light-mode .form-control {
+            background: #fff;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+
+        body.dark-mode .form-control {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+        }
+
+        .btn-primary {
+            transition: 0.3s;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        /* Theme Toggle */
+        body.light-mode .theme-toggle {
+            color: #333;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #f4f4f4;
+        }
+
+        /* 🏁 Footer */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body class="light-mode"> <!-- Default to Light Mode -->
+
+    <!-- 🌗 Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+    <!-- 🎭 Sidebar -->
+    <div class="sidebar">
+        <h3 class="text-center">DMedia</h3>
+        <a href="#">Dashboard</a>
+        <a href="#">Profile</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        <!-- 🎛️ Header -->
+        <header class="header">
+            <div>
+                <h2>Welcome to Your Dashboard</h2>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </header>
+
+        <!-- 🚀 Cards Section -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <h3>Profile Overview</h3>
+                    <p>Your basic profile information and recent activities.</p>
+                    <button class="btn btn-primary">View Profile</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <h3>Recent Activity</h3>
+                    <p>See your recent interactions and activities on the platform.</p>
+                    <button class="btn btn-primary">View Activity</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <h3>Settings</h3>
+                    <p>Modify your account settings or preferences.</p>
+                    <button class="btn btn-primary">Go to Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🏁 Footer -->
+        <footer>
+            <p>&copy; 2025 DMedia | <a href="#">Privacy Policy</a> | <a href="#">Terms</a></p>
+        </footer>
+    </div>
+
+    <!-- 🌗 Theme Toggle Script -->
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('light-mode')) {
+                body.classList.replace('light-mode', 'dark-mode');
+                button.innerHTML = "☀️";
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.replace('dark-mode', 'light-mode');
+                button.innerHTML = "🌙";
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme from LocalStorage
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.replace('light-mode', 'dark-mode');
+                document.querySelector('.theme-toggle').innerHTML = "☀️";
+            }
+        });
+    </script>
+</body>
+</html>

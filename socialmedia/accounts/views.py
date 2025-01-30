@@ -50,3 +50,8 @@ def logout_view(request):
 # Home View 
 def home(request):
     return render(request, 'home.html')
+
+
+def dashboard(request):
+    # Add logic for dashboard here (e.g., showing the user’s information)
+    return render(request, 'dashboard.html')

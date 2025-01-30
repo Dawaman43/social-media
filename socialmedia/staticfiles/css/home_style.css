@@ -1,0 +1,6 @@
+/* Custom styling for the main logo */
+.main-logo {
+  width: 70px;     /* Set height equal to width to make it square */
+  border-radius: 50%; /* Make the image round */
+  object-fit: cover;  /* Ensure the image covers the circular area */
+}
